@@ -6,7 +6,7 @@ import { FaLinkedin, FaJava } from "react-icons/fa";
 import {
   Mail, Phone, MapPin, ExternalLink, ChevronDown,
   Sparkles, GraduationCap, Briefcase, Award, ArrowUpRight,
-  Code2, Database, Cpu, Star
+  Code2, Database, Cpu, Star, Copy, Check
 } from "lucide-react";
 
 const fadeUp = {
@@ -23,6 +23,127 @@ function useReveal(margin = "-60px") {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: margin as any });
   return { ref, isInView };
+}
+
+function useTypewriter(words: string[], speed = 75, pause = 2000) {
+  const [text, setText] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  useEffect(() => {
+    const current = words[wordIndex % words.length];
+    const delay = deleting ? speed / 2 : speed;
+    const timer = setTimeout(() => {
+      if (!deleting) {
+        setText(current.slice(0, text.length + 1));
+        if (text.length + 1 === current.length) setTimeout(() => setDeleting(true), pause);
+      } else {
+        setText(current.slice(0, text.length - 1));
+        if (text.length - 1 === 0) { setDeleting(false); setWordIndex((i) => (i + 1) % words.length); }
+      }
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [text, deleting, wordIndex, words, speed, pause]);
+  return text;
+}
+
+function AnimatedCounter({ target, suffix = "", decimals = 0 }: { target: number; suffix?: string; decimals?: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!isInView) return;
+    const duration = 1600;
+    const start = performance.now();
+    const animate = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(parseFloat((eased * target).toFixed(decimals)));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [isInView, target, decimals]);
+  return <span ref={ref}>{count.toFixed(decimals)}{suffix}</span>;
+}
+
+function CustomCursor() {
+  const [pos, setPos] = useState({ x: -100, y: -100 });
+  const [hovered, setHovered] = useState(false);
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
+    const onOver = (e: MouseEvent) => { if ((e.target as HTMLElement).closest("a, button")) setHovered(true); };
+    const onOut = () => setHovered(false);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseover", onOver);
+    window.addEventListener("mouseout", onOut);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseover", onOver); window.removeEventListener("mouseout", onOut); };
+  }, []);
+  return (
+    <>
+      <motion.div
+        className="fixed top-0 left-0 w-4 h-4 rounded-full bg-violet-400 pointer-events-none z-[9999] mix-blend-screen"
+        animate={{ x: pos.x - 8, y: pos.y - 8, scale: hovered ? 2.5 : 1 }}
+        transition={{ type: "spring", stiffness: 600, damping: 30, mass: 0.4 }}
+      />
+      <motion.div
+        className="fixed top-0 left-0 w-9 h-9 rounded-full border border-violet-400/40 pointer-events-none z-[9998]"
+        animate={{ x: pos.x - 18, y: pos.y - 18, scale: hovered ? 1.8 : 1, opacity: hovered ? 0.8 : 0.4 }}
+        transition={{ type: "spring", stiffness: 180, damping: 22, mass: 0.8 }}
+      />
+    </>
+  );
+}
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-500 via-fuchsia-500 to-teal-400 z-[100] origin-left"
+      style={{ scaleX }}
+    />
+  );
+}
+
+function ScrollToTop() {
+  const { scrollY } = useScroll();
+  const [visible, setVisible] = useState(false);
+  useEffect(() => scrollY.on("change", (v) => setVisible(v > 400)), [scrollY]);
+  return (
+    <motion.button
+      animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.8, y: visible ? 0 : 10 }}
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      style={{ pointerEvents: visible ? "auto" : "none" }}
+      className="fixed bottom-8 right-8 w-11 h-11 rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:-translate-y-1 transition-shadow duration-200 z-50"
+      aria-label="Scroll to top"
+    >
+      <ChevronDown className="w-4 h-4 rotate-180" />
+    </motion.button>
+  );
+}
+
+function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const dx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+    const dy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+    setTilt({ x: -dy * 5, y: dx * 5 });
+  };
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMouseMove}
+      onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+      animate={{ rotateX: tilt.x, rotateY: tilt.y }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      style={{ transformStyle: "preserve-3d" }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 function RevealSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -164,11 +285,21 @@ const certifications = [
   },
 ];
 
+const ROLES = ["Software Developer", "Java Developer", "Full Stack Learner", "Problem Solver", "B.Tech IT Student"];
+
 export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
   const { scrollY } = useScroll();
   const navBg = useTransform(scrollY, [0, 60], ["rgba(8,8,20,0)", "rgba(8,8,20,0.85)"]);
+  const typedRole = useTypewriter(ROLES);
+
+  const copyEmail = () => {
+    navigator.clipboard.writeText("k4386228@gmail.com");
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000);
+  };
 
   const navLinks = [
     { id: "about", label: "About" },
@@ -192,6 +323,9 @@ export default function Portfolio() {
 
   return (
     <div className="min-h-screen bg-[#060612] text-white overflow-x-hidden">
+      <CustomCursor />
+      <ScrollProgress />
+      <ScrollToTop />
 
       {/* ── NAV ── */}
       <motion.nav
@@ -287,8 +421,9 @@ export default function Portfolio() {
 
             <motion.div variants={fadeUp} className="flex items-center gap-3 mb-6">
               <div className="h-px w-12 bg-gradient-to-r from-violet-500 to-transparent" />
-              <span className="font-mono text-sm text-slate-400 tracking-widest uppercase">
-                Software Developer
+              <span className="font-mono text-sm tracking-widest uppercase">
+                <span className="text-violet-300">{typedRole}</span>
+                <span className="animate-pulse text-violet-400">|</span>
               </span>
             </motion.div>
 
@@ -340,13 +475,15 @@ export default function Portfolio() {
               className="flex flex-wrap gap-8 pt-8 border-t border-white/8"
             >
               {[
-                { value: "8.91", label: "CGPA" },
-                { value: "2+", label: "Projects" },
-                { value: "2", label: "Certifications" },
-                { value: "6+", label: "Technologies" },
+                { target: 8.91, decimals: 2, suffix: "", label: "CGPA" },
+                { target: 2, decimals: 0, suffix: "+", label: "Projects" },
+                { target: 2, decimals: 0, suffix: "", label: "Certifications" },
+                { target: 6, decimals: 0, suffix: "+", label: "Technologies" },
               ].map((stat) => (
                 <div key={stat.label} className="flex flex-col gap-0.5" data-testid={`hero-stat-${stat.label.toLowerCase()}`}>
-                  <span className="text-2xl font-bold gradient-text-purple">{stat.value}</span>
+                  <span className="text-2xl font-bold gradient-text-purple">
+                    <AnimatedCounter target={stat.target} suffix={stat.suffix} decimals={stat.decimals} />
+                  </span>
                   <span className="text-xs text-slate-500 uppercase tracking-wider font-mono">{stat.label}</span>
                 </div>
               ))}
@@ -611,12 +748,11 @@ export default function Portfolio() {
 
             <div className="grid lg:grid-cols-2 gap-6">
               {projects.map((p, i) => (
+                <TiltCard key={p.title} className={`relative overflow-hidden rounded-3xl border glass-card p-8 flex flex-col gap-5 transition-all duration-300 ${p.borderColor}`}>
                 <motion.div
-                  key={p.title}
                   variants={fadeUp}
-                  whileHover={{ y: -6 }}
-                  className={`relative overflow-hidden rounded-3xl border glass-card p-8 flex flex-col gap-5 transition-all duration-400 ${p.borderColor}`}
                   data-testid={`project-card-${i}`}
+                  className="h-full"
                 >
                   {/* Background gradient */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${p.gradient} pointer-events-none`} />
@@ -655,6 +791,7 @@ export default function Portfolio() {
                     </div>
                   </div>
                 </motion.div>
+                </TiltCard>
               ))}
             </div>
           </RevealSection>
@@ -719,8 +856,25 @@ export default function Portfolio() {
             <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
               {/* Email / Phone / Location */}
               <motion.div variants={fadeUp} className="space-y-3">
+                {/* Email — with copy button */}
+                <div
+                  className="flex items-center gap-4 p-4 rounded-xl border border-white/8 bg-white/3 backdrop-blur-sm transition-all duration-200 hover:border-violet-500/50 hover:text-violet-300"
+                  data-testid="contact-email"
+                >
+                  <span className="text-slate-500"><Mail className="w-4 h-4" /></span>
+                  <a href="mailto:k4386228@gmail.com" className="text-sm text-slate-300 hover:text-white transition-colors flex-1">
+                    k4386228@gmail.com
+                  </a>
+                  <button
+                    onClick={copyEmail}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border border-white/10 text-slate-400 hover:border-violet-500/50 hover:text-violet-300 hover:bg-violet-500/10 transition-all duration-200"
+                    data-testid="copy-email-btn"
+                    title="Copy email"
+                  >
+                    {emailCopied ? <><Check className="w-3 h-3 text-emerald-400" /><span className="text-emerald-400">Copied!</span></> : <><Copy className="w-3 h-3" />Copy</>}
+                  </button>
+                </div>
                 {[
-                  { icon: <Mail className="w-4 h-4" />, label: "k4386228@gmail.com", href: "mailto:k4386228@gmail.com", testId: "contact-email", color: "hover:border-violet-500/50 hover:text-violet-300" },
                   { icon: <Phone className="w-4 h-4" />, label: "8526543130", href: "tel:8526543130", testId: "contact-phone", color: "hover:border-teal-500/50 hover:text-teal-300" },
                   { icon: <MapPin className="w-4 h-4" />, label: "Tamil Nadu, Coimbatore", href: null, testId: "contact-location", color: "" },
                 ].map((item) => (
