@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import profilePhoto from "@assets/WhatsApp_Image_2026-05-27_at_6.05.24_PM_1779885467705.jpeg";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { SiGithub, SiLeetcode, SiMysql, SiPostgresql, SiJavascript, SiHtml5, SiCss, SiPython } from "react-icons/si";
 import { FaLinkedin, FaJava } from "react-icons/fa";
@@ -254,12 +255,15 @@ export default function Portfolio() {
         />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-24 pb-16">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={stagger}
-            className="max-w-4xl"
-          >
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+
+            {/* LEFT — text content */}
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={stagger}
+              className="flex-1 min-w-0"
+            >
             <motion.div variants={fadeUp} className="flex items-center gap-3 mb-6">
               <span className="flex items-center gap-1.5 text-xs font-mono font-medium px-3 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-300">
                 <Sparkles className="w-3 h-3" />
@@ -269,14 +273,14 @@ export default function Portfolio() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-6xl md:text-8xl font-bold leading-[1.0] mb-2 tracking-tight"
+              className="text-5xl md:text-7xl font-bold leading-[1.0] mb-2 tracking-tight"
               data-testid="hero-name"
             >
               <span className="text-white">Kanchana</span>
             </motion.h1>
             <motion.h1
               variants={fadeUp}
-              className="text-6xl md:text-8xl font-bold leading-[1.0] mb-6 tracking-tight gradient-text"
+              className="text-5xl md:text-7xl font-bold leading-[1.0] mb-6 tracking-tight gradient-text"
             >
               M.
             </motion.h1>
@@ -290,7 +294,7 @@ export default function Portfolio() {
 
             <motion.p
               variants={fadeUp}
-              className="text-slate-300 text-lg md:text-xl max-w-2xl leading-relaxed mb-10"
+              className="text-slate-300 text-lg md:text-xl max-w-xl leading-relaxed mb-10"
             >
               B.Tech Information Technology student at Rathinam Technical Campus with a{" "}
               <span className="text-white font-semibold">CGPA of 8.91</span>. Passionate about
@@ -347,7 +351,52 @@ export default function Portfolio() {
                 </div>
               ))}
             </motion.div>
-          </motion.div>
+            </motion.div>
+
+            {/* RIGHT — photo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="flex-shrink-0 flex items-center justify-center lg:justify-end"
+            >
+              <div className="relative">
+                {/* Outer glow ring */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-teal-400 blur-2xl opacity-40 scale-110" />
+                {/* Spinning gradient border */}
+                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full p-[3px] bg-gradient-to-br from-violet-500 via-fuchsia-500 to-teal-400">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-slate-900 ring-4 ring-slate-900">
+                    <img
+                      src={profilePhoto}
+                      alt="Kanchana M"
+                      className="w-full h-full object-cover object-top"
+                      data-testid="profile-photo"
+                    />
+                  </div>
+                </div>
+                {/* Floating badge — CGPA */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className="absolute -bottom-3 -right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-violet-500/40 shadow-xl shadow-violet-500/20"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-sm font-bold text-white">8.91 CGPA</span>
+                </motion.div>
+                {/* Floating badge — B.Tech */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1.1 }}
+                  className="absolute -top-3 -left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900 border border-teal-500/40 shadow-xl shadow-teal-500/10"
+                >
+                  <span className="text-xs font-mono text-teal-400 font-semibold">B.Tech IT</span>
+                </motion.div>
+              </div>
+            </motion.div>
+
+          </div>{/* end flex row */}
 
           <motion.div
             initial={{ opacity: 0 }}
