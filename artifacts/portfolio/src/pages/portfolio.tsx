@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import profilePhoto from "@assets/WhatsApp_Image_2026-05-27_at_6.05.24_PM_1779885467705.jpeg";
+import { generateResumePDF } from "../utils/generateResume";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { SiGithub, SiLeetcode, SiMysql, SiPostgresql, SiJavascript, SiHtml5, SiCss, SiPython } from "react-icons/si";
 import { FaLinkedin, FaJava } from "react-icons/fa";
 import {
   Mail, Phone, MapPin, ExternalLink, ChevronDown,
   Sparkles, GraduationCap, Briefcase, Award, ArrowUpRight,
-  Code2, Database, Cpu, Star, Copy, Check
+  Code2, Database, Cpu, Star, Copy, Check, Download
 } from "lucide-react";
 
 const fadeUp = {
@@ -467,6 +468,14 @@ export default function Portfolio() {
                 <SiLeetcode className="w-4 h-4" />
                 LeetCode
               </a>
+              <button
+                onClick={generateResumePDF}
+                data-testid="download-resume-btn"
+                className="flex items-center gap-2.5 px-6 py-3 rounded-full border border-violet-500/50 text-violet-300 text-sm font-medium hover:bg-violet-500/15 hover:border-violet-400 hover:text-violet-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/20"
+              >
+                <Download className="w-4 h-4" />
+                Download Resume
+              </button>
             </motion.div>
 
             {/* Hero stats bar */}
