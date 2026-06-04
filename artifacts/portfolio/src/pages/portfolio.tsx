@@ -408,16 +408,10 @@ export default function Portfolio() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-5xl md:text-7xl font-bold leading-[1.0] mb-2 tracking-tight"
+              className="text-5xl md:text-7xl font-bold leading-[1.0] mb-6 tracking-tight whitespace-nowrap"
               data-testid="hero-name"
             >
-              <span className="text-white">Kanchana</span>
-            </motion.h1>
-            <motion.h1
-              variants={fadeUp}
-              className="text-5xl md:text-7xl font-bold leading-[1.0] mb-6 tracking-tight gradient-text"
-            >
-              M.
+              <span className="text-white">Kanchana</span><span className="gradient-text">.M</span>
             </motion.h1>
 
             <motion.div variants={fadeUp} className="flex items-center gap-3 mb-6">
